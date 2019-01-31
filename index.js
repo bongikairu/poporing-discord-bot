@@ -96,15 +96,18 @@ bot.on('message', function (user, userID, channelID, message, evt) {
     const check_string = "<@" + bot.id + "> ";
     const url_check_string_sea = "https://poporing.life/?search=";
     const url_check_string_glboal = "https://global.poporing.life/?search=";
+    if (userID === bot.id) {
+        return;
+    }
     if (message.startsWith(check_string) || message.startsWith(url_check_string_sea) || message.startsWith(url_check_string_glboal) || dm_channel) {
         let server = null;
         let search_query = message.trim();
-        if(message.startsWith(check_string)) {
+        if (message.startsWith(check_string)) {
             search_query = message.substr(check_string.length).trim();
-        } else if(message.startsWith(url_check_string_sea)) {
+        } else if (message.startsWith(url_check_string_sea)) {
             search_query = message.substr(url_check_string_sea.length).replace(/_/g, " ").trim();
             server = "sea";
-        } else if(message.startsWith(url_check_string_glboal)) {
+        } else if (message.startsWith(url_check_string_glboal)) {
             search_query = message.substr(url_check_string_glboal.length).replace(/_/g, " ").trim();
             server = "global";
         }
