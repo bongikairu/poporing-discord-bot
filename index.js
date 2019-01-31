@@ -126,7 +126,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                 client.get('u.' + userID, (err3, res3) => {
 
                     let default_server = null;
-                    if (!default_server && res3) default_server = res2.toString();
+                    if (!default_server && res3) default_server = res3.toString();
                     if (default_server === "auto") default_server = null;
                     if (!default_server && res) default_server = res.toString();
                     if (!default_server && res2) default_server = res2.toString();
