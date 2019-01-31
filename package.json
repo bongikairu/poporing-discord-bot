@@ -1,0 +1,23 @@
+{
+  "name": "poporing-discord-bot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "BongiKairu",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.18.0",
+    "date-fns": "^2.0.0-alpha.25",
+    "discord.io": "Woor/discord.io#gateway_v6",
+    "fuse.js": "^3.3.0",
+    "numeral": "^2.0.6",
+    "redis": "^2.8.0",
+    "winston": "^3.2.0"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "logs": "heroku logs --tail"
+  },
+  "engines": {
+    "node": "8.x"
+  }
+}
