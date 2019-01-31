@@ -264,21 +264,21 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                 client.set("u." + userID, "global");
                                 bot.sendMessage({
                                     to: channelID,
-                                    message: "Default Server for you set to Global",
+                                    message: "Default Server for <@" + userID + "> set to Global",
                                 });
                                 break;
                             case "myserver=sea":
                                 client.set("u." + userID, "sea");
                                 bot.sendMessage({
                                     to: channelID,
-                                    message: "Default Server for you set to SEA",
+                                    message: "Default Server for <@" + userID + "> set to SEA",
                                 });
                                 break;
                             case "myserver=auto":
                                 client.set("u." + userID, "auto");
                                 bot.sendMessage({
                                     to: channelID,
-                                    message: "Default Server for you set to Channel's Default",
+                                    message: "Default Server for <@" + userID + "> set to Channel's Default",
                                 });
                                 break;
                             case "channel=global":
@@ -313,7 +313,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                 if (dm_channel) {
                                     bot.sendMessage({
                                         to: channelID,
-                                        message: "Just @ the bot follow by item name to get it latest price, prepend s/ or g/ to specify the server, or use command below to change a default one\n\n**cmd/myserver=global** Set default server for you to Global Server\n**cmd/myserver=sea** Set default server for you to SEA Server\n\n**cmd/myserver=auto** Set default server for your to Channel's Default\n**cmd/channel=global** Set default server for this DM channel to Global Server\n**cmd/channel=sea** Set default server for this DM channel to SEA Server",
+                                        message: "Just @ the bot follow by item name to get it latest price, prepend s/ or g/ to specify the server, or use command below to change a default one\n\n**cmd/myserver=global** Set default server for you to Global Server\n**cmd/myserver=sea** Set default server for you to SEA Server\n**cmd/myserver=auto** Set default server for your to Channel's Default\n\n**cmd/channel=global** Set default server for this DM channel to Global Server\n**cmd/channel=sea** Set default server for this DM channel to SEA Server",
                                     });
                                 } else {
                                     bot.sendMessage({
