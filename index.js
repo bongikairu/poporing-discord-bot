@@ -103,17 +103,22 @@ bot.on('message', function (user, userID, channelID, message, evt) {
     }
     if (message.startsWith(check_string) || message.startsWith(check_string_name) || message.startsWith(url_check_string_sea) || message.startsWith(url_check_string_glboal) || dm_channel) {
         let server = null;
+        let activation = "unknown";
         let search_query = message.trim();
         if (message.startsWith(check_string)) {
             search_query = message.substr(check_string.length).trim();
+            activation = "mention";
         } else if (message.startsWith(check_string_name)) {
             search_query = message.substr(check_string_name.length).trim();
+            activation = "mention_text";
         } else if (message.startsWith(url_check_string_sea)) {
             search_query = message.substr(url_check_string_sea.length).replace(/_/g, " ").trim();
             server = "sea";
+            activation = "url_sea";
         } else if (message.startsWith(url_check_string_glboal)) {
             search_query = message.substr(url_check_string_glboal.length).replace(/_/g, " ").trim();
             server = "global";
+            activation = "url_global";
         }
         let query = search_query;
         const has_slash = search_query.indexOf("/");
@@ -239,6 +244,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                     item_name,
                                     display_name: show_list.display_name,
                                     message,
+                                    activation,
                                     server,
                                     query,
                                     discord: guild_id,
@@ -267,6 +273,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                     error: "Code Error",
                                     error_obj: e,
                                     message,
+                                    activation,
                                     server,
                                     query,
                                     discord: guild_id,
@@ -286,6 +293,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                 error: "API Error",
                                 error_obj: e,
                                 message,
+                                activation,
                                 server,
                                 query,
                                 discord: guild_id,
@@ -431,6 +439,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                             cmd: query.toLowerCase(),
                             cmd_done: cmd_done,
                             message,
+                            activation,
                             server,
                             query,
                             discord: guild_id,
@@ -443,6 +452,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                             type: "DISCORD_BOT_QUERY_FAIL",
                             error: "INVALID_SERVER",
                             message,
+                            activation,
                             server,
                             query,
                             discord: guild_id,
