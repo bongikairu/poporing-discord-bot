@@ -22,11 +22,6 @@ var bot = new Discord.Client({
     token: process.env.DISCORD_TOKEN,
     // autorun: true
 });
-bot.on('ready', function (evt) {
-    logger.info('Connected');
-    logger.info('Logged in as: ');
-    logger.info(bot.username + ' - (' + bot.id + ')');
-});
 
 let item_list = [];
 let fuse = null;
@@ -86,6 +81,12 @@ axios.get("https://api.poporing.life/get_item_list", {
     fuse_tokenize = new Fuse(item_list, options_tokenize); // "list" is the item array
     logger.info('Fuzzy Search prepared');
     bot.connect();
+});
+
+bot.on('ready', function (evt) {
+    logger.info('Connected');
+    logger.info('Logged in as: ');
+    logger.info(bot.username + ' - (' + bot.id + ')');
 });
 
 bot.on('message', function (user, userID, channelID, message, evt) {
