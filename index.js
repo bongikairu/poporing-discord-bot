@@ -103,7 +103,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
     }
     if (message.startsWith(check_string) || message.startsWith(check_string_name) || message.startsWith(url_check_string_sea) || message.startsWith(url_check_string_glboal) || dm_channel) {
         let server = null;
-        let activation = "unknown";
+        let activation = "dm";
         let search_query = message.trim();
         if (message.startsWith(check_string)) {
             search_query = message.substr(check_string.length).trim();
