@@ -233,7 +233,20 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                 } else {
                                     image_url = "https://via.placeholder.com/50x50?text=?";
                                 }
-                                logger.info(server_icon + " " + show_list.display_name + " / Price = " + price + " / Volume = " + volume + " / Last Update " + timestamp + " / " + footnote);
+                                // logger.info(server_icon + " " + show_list.display_name + " / Price = " + price + " / Volume = " + volume + " / Last Update " + timestamp + " / " + footnote);
+                                logger.log('info', {
+                                    type: "DISCORD_BOT_QUERY_DONE",
+                                    item_name,
+                                    display_name: show_list.display_name,
+                                    message,
+                                    server,
+                                    query,
+                                    discord: guild_id,
+                                    channel: channelID,
+                                    channelIsDM: !!dm_channel,
+                                    user: userID,
+                                });
+
                                 bot.sendMessage({
                                     to: channelID,
                                     // message: server_icon + " " + show_list.display_name + " / Price = " + numeral(price).format("0,0") + " / Volume = " + numeral(volume).format("0,0") + " / Last Update " + formatDistance(fromTimestamp(timestamp), new Date()),
@@ -249,19 +262,40 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                     }
                                 });
                             } catch (e) {
-                                logger.info('Code error ');
-                                logger.info(e);
+                                logger.log('info', {
+                                    type: "DISCORD_BOT_QUERY_FAIL",
+                                    error: "Code Error",
+                                    error_obj: e,
+                                    message,
+                                    server,
+                                    query,
+                                    discord: guild_id,
+                                    channel: channelID,
+                                    channelIsDM: !!dm_channel,
+                                    user: userID,
+                                });
                                 bot.sendMessage({
                                     to: channelID,
-                                    message: server_icon + " " + show_list.display_name + " / Server Error",
+                                    message: server_icon + " " + show_list.display_name + " : Server Error , Please try again later",
                                 });
+                                // comma space typo for debug
                             }
                         }).catch(e => {
-                            logger.info('Server error ');
-                            logger.info(e);
+                            logger.log('info', {
+                                type: "DISCORD_BOT_QUERY_FAIL",
+                                error: "API Error",
+                                error_obj: e,
+                                message,
+                                server,
+                                query,
+                                discord: guild_id,
+                                channel: channelID,
+                                channelIsDM: !!dm_channel,
+                                user: userID,
+                            });
                             bot.sendMessage({
                                 to: channelID,
-                                message: server_icon + " " + show_list.display_name + " / Server Error",
+                                message: server_icon + " " + show_list.display_name + " : Server Error, Please try again later",
                             });
                         });
                     } else if (server === "cmd") {
@@ -274,9 +308,11 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                         } else {
                             admin_permission = true;
                         }
+                        let cmd_done = false;
                         switch (query.toLowerCase()) {
                             case "myserver=global":
                                 client.set("u." + userID, "global");
+                                cmd_done = true;
                                 bot.sendMessage({
                                     to: channelID,
                                     message: "Default Server for <@" + userID + "> set to Global",
@@ -284,6 +320,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                 break;
                             case "myserver=sea":
                                 client.set("u." + userID, "sea");
+                                cmd_done = true;
                                 bot.sendMessage({
                                     to: channelID,
                                     message: "Default Server for <@" + userID + "> set to SEA",
@@ -291,6 +328,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                 break;
                             case "myserver=auto":
                                 client.set("u." + userID, "auto");
+                                cmd_done = true;
                                 bot.sendMessage({
                                     to: channelID,
                                     message: "Default Server for <@" + userID + "> set to Channel's Default",
@@ -299,6 +337,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                             case "channel=global":
                                 if (admin_permission && !dm_channel) {
                                     client.set("c." + channelID, "global");
+                                    cmd_done = true;
                                     bot.sendMessage({
                                         to: channelID,
                                         message: "Default Server for this Channel set to Global",
@@ -308,6 +347,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                             case "channel=sea":
                                 if (admin_permission && !dm_channel) {
                                     client.set("c." + channelID, "sea");
+                                    cmd_done = true;
                                     bot.sendMessage({
                                         to: channelID,
                                         message: "Default Server for this Channel set to SEA",
@@ -317,6 +357,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                             case "channel=auto":
                                 if (admin_permission && !dm_channel) {
                                     client.set("c." + channelID, "auto");
+                                    cmd_done = true;
                                     bot.sendMessage({
                                         to: channelID,
                                         message: "Default Server for this Channel set to this Discord's Default",
@@ -326,6 +367,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                             case "dm=global":
                                 if (admin_permission && dm_channel) {
                                     client.set("c." + channelID, "global");
+                                    cmd_done = true;
                                     bot.sendMessage({
                                         to: channelID,
                                         message: "Default Server for this DM Channel set to Global",
@@ -335,6 +377,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                             case "dm=sea":
                                 if (admin_permission && dm_channel) {
                                     client.set("c." + channelID, "sea");
+                                    cmd_done = true;
                                     bot.sendMessage({
                                         to: channelID,
                                         message: "Default Server for this DM Channel set to SEA",
@@ -344,6 +387,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                             case "default=global":
                                 if (admin_permission) {
                                     client.set("s." + guild_id, "global");
+                                    cmd_done = true;
                                     bot.sendMessage({
                                         to: channelID,
                                         message: "Default Server for this Discord set to Global",
@@ -353,6 +397,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                             case "default=sea":
                                 if (admin_permission) {
                                     client.set("s." + guild_id, "sea");
+                                    cmd_done = true;
                                     bot.sendMessage({
                                         to: channelID,
                                         message: "Default Server for this Discord set to SEA",
@@ -360,6 +405,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                 }
                                 break;
                             case "help":
+                                cmd_done = true;
                                 if (dm_channel) {
                                     bot.sendMessage({
                                         to: channelID,
@@ -380,8 +426,30 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                 }
                                 break;
                         }
+                        logger.log('info', {
+                            type: "DISCORD_BOT_CMD",
+                            cmd: query.toLowerCase(),
+                            cmd_done: cmd_done,
+                            message,
+                            server,
+                            query,
+                            discord: guild_id,
+                            channel: channelID,
+                            channelIsDM: !!dm_channel,
+                            user: userID,
+                        });
                     } else {
-                        logger.info('Invalid server ' + server);
+                        logger.log('info', {
+                            type: "DISCORD_BOT_QUERY_FAIL",
+                            error: "INVALID_SERVER",
+                            message,
+                            server,
+                            query,
+                            discord: guild_id,
+                            channel: channelID,
+                            channelIsDM: !!dm_channel,
+                            user: userID,
+                        });
                     }
                 });
             });
