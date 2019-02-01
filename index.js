@@ -176,7 +176,18 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                         }
 
                         if (!show_list) {
-                            logger.info('Invalid keyword ' + query);
+                            logger.log('info', {
+                                type: "DISCORD_BOT_QUERY_FAIL",
+                                error: "Not Found",
+                                message,
+                                activation,
+                                server,
+                                query,
+                                discord: guild_id,
+                                channel: channelID,
+                                channelIsDM: !!dm_channel,
+                                user: userID,
+                            });
                             bot.sendMessage({
                                 to: channelID,
                                 message: query + " not found!"
