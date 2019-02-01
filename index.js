@@ -268,9 +268,9 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                         let admin_permission = false;
                         if (!dm_channel) {
                             const server = bot.servers[guild_id];
-                            const roles = bot.channels[channelID].members[userID].roles;
-                            const permissions = roles.map(r => server.roles[r].permissions);
-                            admin_permission = permissions.map(p => p & 16).reduce((a, c) => a || c, false);
+                            const roles = (server.members[userID] || {}).roles || [];
+                            const permissions = roles.map(r => server.roles[r].permissions || server.roles[r]._permissions);
+                            admin_permission = permissions.map(p => p & (8 + 16)).reduce((a, c) => a || c, false);
                         } else {
                             admin_permission = true;
                         }
