@@ -133,7 +133,9 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                     if (!default_server && res3) default_server = res3.toString();
                     if (default_server === "auto") default_server = null;
                     if (!default_server && res) default_server = res.toString();
+                    if (default_server === "auto") default_server = null;
                     if (!default_server && res2) default_server = res2.toString();
+                    if (default_server === "auto") default_server = null;
                     if (!default_server) default_server = "sea";
 
                     if (!server) server = default_server;
@@ -263,6 +265,15 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                             });
                         });
                     } else if (server === "cmd") {
+                        let admin_permission = false;
+                        if (!dm_channel) {
+                            const server = bot.servers[guild_id];
+                            const roles = bot.channels[channelID].members[userID].roles;
+                            const permissions = roles.map(r => server.roles[r].permissions);
+                            admin_permission = permissions.map(p => p & 16).reduce((a, c) => a || c, false);
+                        } else {
+                            admin_permission = true;
+                        }
                         switch (query.toLowerCase()) {
                             case "myserver=global":
                                 client.set("u." + userID, "global");
@@ -286,57 +297,87 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                 });
                                 break;
                             case "channel=global":
-                                client.set("c." + channelID, "global");
-                                bot.sendMessage({
-                                    to: channelID,
-                                    message: "Default Server for this Channel set to Global",
-                                });
+                                if (admin_permission && !dm_channel) {
+                                    client.set("c." + channelID, "global");
+                                    bot.sendMessage({
+                                        to: channelID,
+                                        message: "Default Server for this Channel set to Global",
+                                    });
+                                }
                                 break;
                             case "channel=sea":
-                                client.set("c." + channelID, "sea");
-                                bot.sendMessage({
-                                    to: channelID,
-                                    message: "Default Server for this Channel set to SEA",
-                                });
+                                if (admin_permission && !dm_channel) {
+                                    client.set("c." + channelID, "sea");
+                                    bot.sendMessage({
+                                        to: channelID,
+                                        message: "Default Server for this Channel set to SEA",
+                                    });
+                                }
+                                break;
+                            case "channel=auto":
+                                if (admin_permission && !dm_channel) {
+                                    client.set("c." + channelID, "auto");
+                                    bot.sendMessage({
+                                        to: channelID,
+                                        message: "Default Server for this Channel set to this Discord's Default",
+                                    });
+                                }
+                                break;
+                            case "dm=global":
+                                if (admin_permission && dm_channel) {
+                                    client.set("c." + channelID, "global");
+                                    bot.sendMessage({
+                                        to: channelID,
+                                        message: "Default Server for this DM Channel set to Global",
+                                    });
+                                }
+                                break;
+                            case "dm=sea":
+                                if (admin_permission && dm_channel) {
+                                    client.set("c." + channelID, "sea");
+                                    bot.sendMessage({
+                                        to: channelID,
+                                        message: "Default Server for this DM Channel set to SEA",
+                                    });
+                                }
                                 break;
                             case "default=global":
-                                client.set("s." + guild_id, "global");
-                                bot.sendMessage({
-                                    to: channelID,
-                                    message: "Default Server for this Discord set to Global",
-                                });
+                                if (admin_permission) {
+                                    client.set("s." + guild_id, "global");
+                                    bot.sendMessage({
+                                        to: channelID,
+                                        message: "Default Server for this Discord set to Global",
+                                    });
+                                }
                                 break;
                             case "default=sea":
-                                client.set("s." + guild_id, "sea");
-                                bot.sendMessage({
-                                    to: channelID,
-                                    message: "Default Server for this Discord set to SEA",
-                                });
+                                if (admin_permission) {
+                                    client.set("s." + guild_id, "sea");
+                                    bot.sendMessage({
+                                        to: channelID,
+                                        message: "Default Server for this Discord set to SEA",
+                                    });
+                                }
                                 break;
                             case "help":
                                 if (dm_channel) {
                                     bot.sendMessage({
                                         to: channelID,
-                                        message: "Just @ the bot follow by item name to get it latest price, prepend s/ or g/ to specify the server, or use command below to change a default one\n\n**cmd/myserver=global** Set default server for you to Global Server\n**cmd/myserver=sea** Set default server for you to SEA Server\n**cmd/myserver=auto** Set default server for your to Channel's Default\n\n**cmd/channel=global** Set default server for this DM channel to Global Server\n**cmd/channel=sea** Set default server for this DM channel to SEA Server",
+                                        message: "Just @ the bot follow by item name to get it latest price, prepend s/ or g/ to specify the server, or use command below to change a default one\n\n**cmd/myserver=global** Set default server for you to Global Server\n**cmd/myserver=sea** Set default server for you to SEA Server\n**cmd/myserver=auto** Set default server for your to Channel's Default\n\n**cmd/dm=global** Set default server for this DM channel to Global Server\n**cmd/dm=sea** Set default server for this DM channel to SEA Server",
                                     });
                                 } else {
-                                    bot.sendMessage({
-                                        to: channelID,
-                                        message: "Just @ the bot follow by item name to get it latest price, prepend s/ or g/ to specify the server, or use command below to change a default one\n\n**cmd/myserver=global** Set default server for you to Global Server\n**cmd/myserver=sea** Set default server for you to SEA Server\n**cmd/myserver=auto** Set default server for your to Channel's Default",
-                                    });
-                                    /*
-                                    bot.sendMessage({
-                                        to: channelID,
-                                        message: "**cmd/channel=global** Set default server for this channel to Global Server\n**cmd/channel=sea** Set default server for this channel to SEA Server\n**cmd/default=global** Set default server for this discord to Global Server\n**cmd/default=sea** Set default server for this discord to SEA Server\n",
-                                    });
-                                     */
+                                    if (!admin_permission) {
+                                        bot.sendMessage({
+                                            to: channelID,
+                                            message: "Just @ the bot follow by item name to get it latest price, prepend s/ or g/ to specify the server, or use command below to change a default one\n\n**cmd/myserver=global** Set default server for you to Global Server\n**cmd/myserver=sea** Set default server for you to SEA Server\n**cmd/myserver=auto** Set default server for your to Channel's Default",
+                                        });
+                                    } else {
+                                        bot.sendMessage({
+                                            to: channelID,
+                                            message: "Just @ the bot follow by item name to get it latest price, prepend s/ or g/ to specify the server, or use command below to change a default one\n\n**cmd/myserver=global** Set default server for you to Global Server\n**cmd/myserver=sea** Set default server for you to SEA Server\n**cmd/myserver=auto** Set default server for your to Channel's Default\n\nChannel and Server Settings:\n**cmd/channel=global** Set default server for this channel to Global Server\n**cmd/channel=sea** Set default server for this channel to SEA Server\n**cmd/channel=auto** Set default server for this channel to this Discord's default\n**cmd/default=global** Set default server for this discord to Global Server\n**cmd/default=sea** Set default server for this discord to SEA Server\n",
+                                        });
+                                    }
                                 }
-                                break;
-                            case "adminhelp":
-                                bot.sendMessage({
-                                    to: channelID,
-                                    message: "**cmd/channel=global** Set default server for this channel to Global Server\n**cmd/channel=sea** Set default server for this channel to SEA Server\n**cmd/default=global** Set default server for this discord to Global Server\n**cmd/default=sea** Set default server for this discord to SEA Server\n",
-                                });
                                 break;
                         }
                     } else {
