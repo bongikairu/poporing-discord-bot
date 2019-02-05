@@ -30,7 +30,7 @@ let fuzzy_search = (s) => s.indexOf(" ") >= 0 ? fuse_tokenize.search(s) : fuse.s
 
 logger.info('Fetching Item List');
 
-axios.get("https://api.poporing.life/get_item_list", {
+axios.get("https://api.poporing.life/get_item_list?includeRefine=1", {
     headers: {
         "Origin": "https://poporing.life",
         "User-Agent": "PoporingBot-01282019",
@@ -428,18 +428,18 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                 if (dm_channel) {
                                     bot.sendMessage({
                                         to: channelID,
-                                        message: "Just @ the bot follow by item name to get it latest price, prepend s/ or g/ to specify the server, or use command below to change a default one\n\n**cmd/myserver=global** Set default server for you to Global Server\n**cmd/myserver=sea** Set default server for you to SEA Server\n**cmd/myserver=auto** Set default server for your to Channel's Default\n\n**cmd/dm=global** Set default server for this DM channel to Global Server\n**cmd/dm=sea** Set default server for this DM channel to SEA Server",
+                                        message: "Just @ the bot follow by item name to get it latest price, prepend s/ or g/ to specify the server, or use command below to change a default one\n\n" + check_string + "**cmd/myserver=global** Set default server for you to Global Server\n" + check_string + "**cmd/myserver=sea** Set default server for you to SEA Server\n" + check_string + "**cmd/myserver=auto** Set default server for your to Channel's Default\n\n" + check_string + "**cmd/dm=global** Set default server for this DM channel to Global Server\n" + check_string + "**cmd/dm=sea** Set default server for this DM channel to SEA Server",
                                     });
                                 } else {
                                     if (!admin_permission) {
                                         bot.sendMessage({
                                             to: channelID,
-                                            message: "Just @ the bot follow by item name to get it latest price, prepend s/ or g/ to specify the server, or use command below to change a default one\n\n**cmd/myserver=global** Set default server for you to Global Server\n**cmd/myserver=sea** Set default server for you to SEA Server\n**cmd/myserver=auto** Set default server for your to Channel's Default",
+                                            message: "Just @ the bot follow by item name to get it latest price, prepend s/ or g/ to specify the server, or use command below to change a default one\n\n" + check_string + "**cmd/myserver=global** Set default server for you to Global Server\n" + check_string + "**cmd/myserver=sea** Set default server for you to SEA Server\n" + check_string + "**cmd/myserver=auto** Set default server for your to Channel's Default",
                                         });
                                     } else {
                                         bot.sendMessage({
                                             to: channelID,
-                                            message: "Just @ the bot follow by item name to get it latest price, prepend s/ or g/ to specify the server, or use command below to change a default one\n\n**cmd/myserver=global** Set default server for you to Global Server\n**cmd/myserver=sea** Set default server for you to SEA Server\n**cmd/myserver=auto** Set default server for your to Channel's Default\n\nChannel and Server Settings:\n**cmd/channel=global** Set default server for this channel to Global Server\n**cmd/channel=sea** Set default server for this channel to SEA Server\n**cmd/channel=auto** Set default server for this channel to this Discord's default\n**cmd/default=global** Set default server for this discord to Global Server\n**cmd/default=sea** Set default server for this discord to SEA Server\n",
+                                            message: "Just @ the bot follow by item name to get it latest price, prepend s/ or g/ to specify the server, or use command below to change a default one\n\n" + check_string + "**cmd/myserver=global** Set default server for you to Global Server\n" + check_string + "**cmd/myserver=sea** Set default server for you to SEA Server\n" + check_string + "**cmd/myserver=auto** Set default server for your to Channel's Default\n\nChannel and Server Settings:\n" + check_string + "**cmd/channel=global** Set default server for this channel to Global Server\n" + check_string + "**cmd/channel=sea** Set default server for this channel to SEA Server\n" + check_string + "**cmd/channel=auto** Set default server for this channel to this Discord's default\n" + check_string + "**cmd/default=global** Set default server for this discord to Global Server\n" + check_string + "**cmd/default=sea** Set default server for this discord to SEA Server\n",
                                         });
                                     }
                                 }
