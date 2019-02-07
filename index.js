@@ -95,19 +95,23 @@ bot.on('message', function (user, userID, channelID, message, evt) {
     // console.log(dm_channel);
     // console.log(guild_id);
     const check_string = "<@" + bot.id + "> ";
+    const check_string_nick = "<@!" + bot.id + "> ";
     const check_string_name = "@PoporingBot ";
     const url_check_string_sea = "https://poporing.life/?search=";
     const url_check_string_glboal = "https://global.poporing.life/?search=";
     if (userID === bot.id) {
         return;
     }
-    if (message.startsWith(check_string) || message.startsWith(check_string_name) || message.startsWith(url_check_string_sea) || message.startsWith(url_check_string_glboal) || dm_channel) {
+    if (message.startsWith(check_string) || message.startsWith(check_string_nick) || message.startsWith(check_string_name) || message.startsWith(url_check_string_sea) || message.startsWith(url_check_string_glboal) || dm_channel) {
         let server = null;
         let activation = "dm";
         let search_query = message.trim();
         if (message.startsWith(check_string)) {
             search_query = message.substr(check_string.length).trim();
             activation = "mention";
+        } else if (message.startsWith(check_string_nick)) {
+            search_query = message.substr(check_string_nick.length).trim();
+            activation = "mention_nick";
         } else if (message.startsWith(check_string_name)) {
             search_query = message.substr(check_string_name.length).trim();
             activation = "mention_text";
