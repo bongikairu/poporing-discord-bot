@@ -89,6 +89,11 @@ bot.on('ready', function (evt) {
     logger.info(bot.username + ' - (' + bot.id + ')');
 });
 
+bot.on('disconnect', function (errMsg, errCode) {
+    logger.info('Disconnected', errMsg, errCode);
+    process.exit(1);
+});
+
 bot.on('message', function (user, userID, channelID, message, evt) {
     const dm_channel = bot.directMessages[channelID];
     const guild_id = evt.d.guild_id;
