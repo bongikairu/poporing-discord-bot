@@ -272,7 +272,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                     channelIsDM: !!dm_channel,
                                     user: userID,
                                 });
-
+                                const color = server === "sea" ? 35037 : 16776960;
                                 bot.sendMessage({
                                     to: channelID,
                                     // message: server_icon + " " + show_list.display_name + " / Price = " + numeral(price).format("0,0") + " / Volume = " + numeral(volume).format("0,0") + " / Last Update " + formatDistance(fromTimestamp(timestamp), new Date()),
@@ -284,7 +284,8 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                         },
                                         "thumbnail": {
                                             "url": image_url,
-                                        }
+                                        },
+                                        "color": color,
                                     }
                                 });
                             } catch (e) {
