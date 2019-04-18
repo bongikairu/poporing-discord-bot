@@ -1,16 +1,21 @@
 {
   "name": "poporing-discord-bot",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "discord_bot.js",
   "author": "BongiKairu",
   "license": "MIT",
   "dependencies": {
+    "@line/bot-sdk": "^6.7.0",
     "axios": "^0.18.0",
+    "body-parser": "^1.18.3",
     "date-fns": "^2.0.0-alpha.25",
     "discord.io": "Woor/discord.io#gateway_v6",
+    "express": "^4.16.4",
     "fuse.js": "^3.3.0",
     "numeral": "^2.0.6",
     "redis": "^2.8.0",
+    "sprintf-js": "^1.1.2",
+    "telegram-bot-client": "^2.1.1",
     "winston": "^3.2.0"
   },
   "scripts": {

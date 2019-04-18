@@ -30,58 +30,62 @@ let fuzzy_search = (s) => s.indexOf(" ") >= 0 ? fuse_tokenize.search(s) : fuse.s
 
 logger.info('Fetching Item List');
 
-axios.get("https://api.poporing.life/get_item_list?includeRefine=1", {
-    headers: {
-        "Origin": "https://poporing.life",
-        "User-Agent": "PoporingBot-01282019",
-    }
-}).then(response => {
-    logger.info('Fetching List fetched');
-    item_list = response.data.data.item_list.map(
-        r => Object.assign(
-            {},
-            r,
-            {
-                display_name_combined: [].concat([r.display_name], r.alt_display_name_list).join("|").toLowerCase(),
-            },
-        )
-    );
-    item_list.sort((a, b) => a.display_name.length - b.display_name.length);
-    var options = {
-        shouldSort: true,
-        tokenize: false,
-        matchAllTokens: true,
-        threshold: 0.6,
-        location: 0,
-        distance: 100,
-        maxPatternLength: 32,
-        minMatchCharLength: 1,
-        keys: [
-            "name",
-            "display_name",
-            "alt_display_name_list"
-        ]
-    };
-    fuse = new Fuse(item_list, options); // "list" is the item array
-    var options_tokenize = {
-        shouldSort: true,
-        tokenize: true,
-        matchAllTokens: true,
-        threshold: 0.6,
-        location: 0,
-        distance: 20,
-        maxPatternLength: 32,
-        minMatchCharLength: 1,
-        keys: [
-            "name",
-            "display_name",
-            "alt_display_name_list"
-        ]
-    };
-    fuse_tokenize = new Fuse(item_list, options_tokenize); // "list" is the item array
-    logger.info('Fuzzy Search prepared');
-    bot.connect();
-});
+try {
+    axios.get("https://api.poporing.life/get_item_list?includeRefine=1", {
+        headers: {
+            "Origin": "https://poporing.life",
+            "User-Agent": "PoporingBot-01282019",
+        }
+    }).then(response => {
+        logger.info('Fetching List fetched');
+        item_list = response.data.data.item_list.map(
+            r => Object.assign(
+                {},
+                r,
+                {
+                    display_name_combined: [].concat([r.display_name], r.alt_display_name_list).join("|").toLowerCase(),
+                },
+            )
+        );
+        item_list.sort((a, b) => a.display_name.length - b.display_name.length);
+        var options = {
+            shouldSort: true,
+            tokenize: false,
+            matchAllTokens: true,
+            threshold: 0.6,
+            location: 0,
+            distance: 100,
+            maxPatternLength: 32,
+            minMatchCharLength: 1,
+            keys: [
+                "name",
+                "display_name",
+                "alt_display_name_list"
+            ]
+        };
+        fuse = new Fuse(item_list, options); // "list" is the item array
+        var options_tokenize = {
+            shouldSort: true,
+            tokenize: true,
+            matchAllTokens: true,
+            threshold: 0.6,
+            location: 0,
+            distance: 20,
+            maxPatternLength: 32,
+            minMatchCharLength: 1,
+            keys: [
+                "name",
+                "display_name",
+                "alt_display_name_list"
+            ]
+        };
+        fuse_tokenize = new Fuse(item_list, options_tokenize); // "list" is the item array
+        logger.info('Fuzzy Search prepared');
+        bot.connect();
+    });
+} catch (e) {
+    process.exit(1);
+}
 
 bot.on('ready', function (evt) {
     logger.info('Connected');
@@ -121,11 +125,15 @@ bot.on('message', function (user, userID, channelID, message, evt) {
             search_query = message.substr(check_string_name.length).trim();
             activation = "mention_text";
         } else if (message.startsWith(url_check_string_sea)) {
-            search_query = message.substr(url_check_string_sea.length).replace(/_/g, " ").trim();
+            search_query = message.substr(url_check_string_glboal.length);
+            if (!search_query.startsWith(":")) search_query = search_query.replace(/_/g, " ");
+            search_query = search_query.trim();
             server = "sea";
             activation = "url_sea";
         } else if (message.startsWith(url_check_string_glboal)) {
-            search_query = message.substr(url_check_string_glboal.length).replace(/_/g, " ").trim();
+            search_query = message.substr(url_check_string_glboal.length);
+            if (!search_query.startsWith(":")) search_query = search_query.replace(/_/g, " ");
+            search_query = search_query.trim();
             server = "global";
             activation = "url_global";
         }
