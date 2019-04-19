@@ -277,6 +277,15 @@ app.post('/line_webhook', line.middleware(line_config), (req, res) => {
         });
 });
 
+app.post('/telegram_push', bodyParser.json(), (req, res, next) => {
+    if (!req.body.message.text || !req.body.message.target_id) {
+        res.json({ok: false});
+        return;
+    }
+    telegram_client.sendMessage(req.body.message.target_id, req.body.message.text, req.body.message.options || {}).catch(e => console.log(e));
+    res.json({ok: true});
+});
+
 app.post('/telegram_webhook', bodyParser.json(), (req, res, next) => {
     console.log(req.body.message);
     if (req.body.message.from.is_bot) {
@@ -305,6 +314,13 @@ app.post('/telegram_webhook', bodyParser.json(), (req, res, next) => {
         query = query.trim();
         server = "global";
         activation = "_url_global";
+    }
+
+    if (query === "cmd/notification") {
+        const link_code = jwt.sign({id: req.body.message.chat.id}, process.env.JWT_SECRET);
+        telegram_client.sendMessage(req.body.message.chat.id, "Please use the following code on Poporing Life Telegram Notification Link when asked").sendMessage(req.body.message.chat.id, link_code).catch(e => console.log(e));
+        res.json({ok: true});
+        return;
     }
 
     let data = null;
