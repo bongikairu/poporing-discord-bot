@@ -325,7 +325,7 @@ app.post('/telegram_webhook', bodyParser.json(), (req, res, next) => {
     }
 
     if (query === "cmd/notification") {
-        const link_code = jwt.sign({id: req.body.message.chat.id}, process.env.JWT_SECRET, {noTimestamp: true});
+        const link_code = jwt.sign({id: req.body.message.chat.id}, process.env.JWT_SECRET, {noTimestamp: true}).replace("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.", "").replace(".", "$");
         telegram_client.sendMessage(req.body.message.chat.id, "Please use the following code on Poporing Life Telegram Notification Link when asked").sendMessage(req.body.message.chat.id, link_code).catch(e => console.log(e));
         res.json({ok: true});
         return;
