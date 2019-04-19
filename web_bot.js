@@ -283,7 +283,11 @@ app.post('/telegram_push', bodyParser.json(), (req, res, next) => {
         res.json({ok: false});
         return;
     }
-    telegram_client.sendMessage(req.body.message.target_id, req.body.message.text, req.body.message.options || {}).catch(e => console.log(e));
+    let msgpm = telegram_client.sendMessage(req.body.message.target_id, req.body.message.text, req.body.message.options || {});
+    if (req.body.message.image) {
+        msgpm = msgpm.sendImage(req.body.message.target_id, req.body.message.image, req.body.message.image_options || req.body.message.options || {})
+    }
+    msgpm.catch(e => console.log(e));
     res.json({ok: true});
 });
 
