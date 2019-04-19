@@ -3,6 +3,7 @@ const line = require('@line/bot-sdk');
 const poporing = require('./poporing');
 const bodyParser = require('body-parser');
 const TelegramBotClient = require('telegram-bot-client');
+const jwt = require('jsonwebtoken');
 
 const port = process.env.PORT || 3000;
 
