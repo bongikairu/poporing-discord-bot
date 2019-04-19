@@ -296,6 +296,13 @@ app.post('/telegram_webhook', bodyParser.json(), (req, res, next) => {
     let server = null;
     let activation = "_direct";
 
+    if (query === "/start") {
+        const text = 'Hey! Thanks for using PoporingBot. Type in any item name (or "/ppr item_name" in group) and I will tell you its current price!';
+        telegram_client.sendMessage(req.body.message.chat.id, text).catch(e => console.log(e));
+        res.json({ok: true});
+        return;
+    }
+
     const check_string = "/ppr ";
 
     query = query.trim();
