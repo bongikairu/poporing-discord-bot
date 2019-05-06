@@ -20,6 +20,8 @@ const telegram_config = {
 };
 const telegram_client = new TelegramBotClient(telegram_config.apiToken);
 
+const FACEBOOK_ACCESS_TOKEN = process.env.FACEBOOK_ACCESS_TOKEN;
+
 const replyText = (token, texts) => {
     texts = Array.isArray(texts) ? texts : [texts];
     return line_client.replyMessage(
@@ -384,6 +386,55 @@ app.post('/telegram_webhook', bodyParser.json(), (req, res, next) => {
         },
     });
     res.json({ok: true});
+});
+
+const sendFacebookTextMessage = (userId, text) => {
+    return axios.post(
+        `https://graph.facebook.com/v2.6/me/messages?access_token=${FACEBOOK_ACCESS_TOKEN}`,
+        {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            data: JSON.stringify({
+                messaging_type: 'RESPONSE',
+                recipient: {
+                    id: userId,
+                },
+                message: {
+                    text,
+                },
+            }),
+        }
+    );
+};
+
+app.get('/facebook_webhook', bodyParser.json(), bodyParser.urlencoded({extended: true}), (req, res, next) => {
+    let VERIFY_TOKEN = '2zakoypXGPsWuYhT';
+
+    let mode = req.query['hub.mode'];
+    let token = req.query['hub.verify_token'];
+    let challenge = req.query['hub.challenge'];
+
+    if (mode && token === VERIFY_TOKEN) {
+        res.status(200).send(challenge);
+    } else {
+        res.sendStatus(403);
+    }
+});
+
+app.post('/facebook_webhook', bodyParser.json(), bodyParser.urlencoded({extended: true}), (req, res, next) => {
+    if (req.body.object === 'page') {
+        req.body.entry.forEach(entry => {
+            entry.messaging.forEach(event => {
+                if (event.message && event.message.text) {
+                    const userId = event.sender.id;
+                    const message = event.message.text;
+                    sendFacebookTextMessage(userId, "Echo " + message);
+                }
+            });
+        });
+        res.status(200).end();
+    }
 });
 
 poporing.setup().then((s) => {
