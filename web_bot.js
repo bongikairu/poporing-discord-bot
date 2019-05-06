@@ -489,7 +489,7 @@ app.post('/facebook_webhook', bodyParser.json(), bodyParser.urlencoded({extended
                         },
                         replyPriceData: (data, request) => {
                             const text = data.server_icon + " " + data.display_name + "\nPrice: " + data.price + " z\nVolume: " + data.volume + " ea\n\nLast Update: " + data.timestamp + (data.footnote ? "\n" + data.footnote : "") + "\n\n" + data.url;
-                            sendFacebookTextMessage(userId, text, true);
+                            sendFacebookTextMessage(userId, text);
                         },
                     });
                 }
@@ -497,6 +497,26 @@ app.post('/facebook_webhook', bodyParser.json(), bodyParser.urlencoded({extended
         });
         res.status(200).end();
     }
+});
+
+app.post('/facebook_push', bodyParser.json(), (req, res, next) => {
+    if (!req.body.message.text || !req.body.message.target_id) {
+        res.json({ok: false});
+        return;
+    }
+    const userId = req.body.message.target_id;
+    if (req.body.message.image) {
+        sendFacebookTextMessage(userId, {
+            attachment: {
+                type: "image",
+                payload: {
+                    url: req.body.message.image,
+                }
+            }
+        }, true);
+    }
+    sendFacebookTextMessage(userId, req.body.message.text);
+    res.json({ok: true});
 });
 
 poporing.setup().then((s) => {
