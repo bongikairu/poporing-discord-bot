@@ -406,7 +406,7 @@ const sendFacebookTextMessage = (userId, text) => {
                 },
             }),
         }
-    );
+    ).catch(e => console.log("Facebook send message error", e));
 };
 
 app.get('/facebook_webhook', bodyParser.json(), bodyParser.urlencoded({extended: true}), (req, res, next) => {
