@@ -390,21 +390,14 @@ app.post('/telegram_webhook', bodyParser.json(), (req, res, next) => {
 });
 
 const sendFacebookTextMessage = (userId, text) => {
-    return axios.post(
-        `https://graph.facebook.com/v2.6/me/messages?access_token=${FACEBOOK_ACCESS_TOKEN}`,
+    return axios.post(`https://graph.facebook.com/v2.6/me/messages?access_token=${FACEBOOK_ACCESS_TOKEN}`,
         {
-            headers: {
-                'Content-Type': 'application/json',
+            recipient: {
+                id: userId,
             },
-            data: JSON.stringify({
-                messaging_type: 'RESPONSE',
-                recipient: {
-                    id: userId,
-                },
-                message: {
-                    text,
-                },
-            }),
+            message: {
+                text,
+            },
         }
     ).catch(e => console.log("Facebook send message error", e));
 };
