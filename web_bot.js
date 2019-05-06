@@ -391,10 +391,10 @@ app.post('/telegram_webhook', bodyParser.json(), (req, res, next) => {
 });
 
 // messaging type is RESPONSE or UPDATE
-const sendFacebookTextMessage = (userId, text, raw = false, messaging_type = "RESPONSE") => {
+const sendFacebookTextMessage = (userId, text, raw = false) => {
     return axios.post(`https://graph.facebook.com/v2.6/me/messages?access_token=${FACEBOOK_ACCESS_TOKEN}`,
-        {
-            messaging_type: messaging_type,
+        raw ? text : {
+            messaging_type: "RESPONSE",
             recipient: {
                 id: userId,
             },
@@ -465,6 +465,14 @@ app.post('/facebook_webhook', bodyParser.json(), bodyParser.urlencoded({extended
                         return;
                     }
 
+                    sendFacebookTextMessage(userId, {
+                        messaging_type: "RESPONSE",
+                        recipient: {
+                            id: userId,
+                        },
+                        sender_action: "typing_on",
+                    }, true);
+
                     let data = {
                         user_id: "facebook-" + userId,
                         channel_id: "facebook-dm-" + userId,
@@ -507,15 +515,29 @@ app.post('/facebook_push', bodyParser.json(), (req, res, next) => {
     const userId = req.body.message.target_id;
     if (req.body.message.image) {
         sendFacebookTextMessage(userId, {
-            attachment: {
-                type: "image",
-                payload: {
-                    url: req.body.message.image,
-                }
+            messaging_type: "UPDATE",
+            recipient: {
+                id: userId,
+            },
+            message: {
+                attachment: {
+                    type: "image",
+                    payload: {
+                        url: req.body.message.image,
+                    }
+                },
             }
         }, true);
     }
-    sendFacebookTextMessage(userId, req.body.message.text);
+    sendFacebookTextMessage(userId, {
+        messaging_type: "UPDATE",
+        recipient: {
+            id: userId,
+        },
+        message: {
+            text: req.body.message.text,
+        }
+    }, true);
     res.json({ok: true});
 });
 
