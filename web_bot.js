@@ -240,7 +240,8 @@ function lineHandleEvent(event) {
                 case 'text':
                     return handleText(event);
                 default:
-                    throw new Error(`Unknown message: ${JSON.stringify(message)}`);
+                    return replyText(event.replyToken, `Sorry, PoporingBot don't understand ${message.type}`);
+                // throw new Error(`Unknown message: ${JSON.stringify(message)}`);
             }
 
         case 'follow':
@@ -333,7 +334,7 @@ app.post('/telegram_webhook', bodyParser.json(), (req, res, next) => {
     }
 
     if (query === "cmd/notification") {
-        const link_code = jwt.sign({id: req.body.message.chat.id}, process.env.JWT_SECRET, {noTimestamp: true}).replace("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.", "").replace(".", "$");
+        const link_code = jwt.sign({id: req.body.message.chat.id, t: "tg"}, process.env.JWT_SECRET, {noTimestamp: true}).replace("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.", "").replace(".", "$");
         telegram_client.sendMessage(req.body.message.chat.id, "Please use the following code on Poporing Life Telegram Notification Link when asked").sendMessage(req.body.message.chat.id, link_code).catch(e => console.log(e));
         res.json({ok: true});
         return;
@@ -389,13 +390,15 @@ app.post('/telegram_webhook', bodyParser.json(), (req, res, next) => {
     res.json({ok: true});
 });
 
-const sendFacebookTextMessage = (userId, text) => {
+// messaging type is RESPONSE or UPDATE
+const sendFacebookTextMessage = (userId, text, raw = false, messaging_type = "RESPONSE") => {
     return axios.post(`https://graph.facebook.com/v2.6/me/messages?access_token=${FACEBOOK_ACCESS_TOKEN}`,
         {
+            messaging_type: messaging_type,
             recipient: {
                 id: userId,
             },
-            message: {
+            message: raw ? text : {
                 text,
             },
         }
@@ -421,9 +424,74 @@ app.post('/facebook_webhook', bodyParser.json(), bodyParser.urlencoded({extended
         req.body.entry.forEach(entry => {
             entry.messaging.forEach(event => {
                 if (event.message && event.message.text) {
+                    // Facebook messenger current have only 1-on-1 chat
                     const userId = event.sender.id;
                     const message = event.message.text;
-                    sendFacebookTextMessage(userId, "Echo " + message);
+
+                    let query = message || "";
+                    let server = null;
+                    let activation = "_direct";
+
+                    if (query === "/start" || query === "/ppr") {
+                        const text = 'Hey! Thanks for using PoporingBot. Type in any item name and I will tell you its current price!';
+                        sendFacebookTextMessage(userId, text).catch(e => console.log(e));
+                        return;
+                    }
+
+                    const check_string = "/ppr ";
+
+                    query = query.trim();
+                    if (query.startsWith(check_string)) {
+                        query = query.substr(check_string.length).trim();
+                        activation = "_mention";
+                    } else if (query.startsWith(url_check_string_sea)) {
+                        query = query.substr(url_check_string_sea.length);
+                        if (!query.startsWith(":")) query = query.replace(/_/g, " ");
+                        query = query.trim();
+                        server = "sea";
+                        activation = "_url_sea";
+                    } else if (query.startsWith(url_check_string_glboal)) {
+                        query = query.substr(url_check_string_glboal.length);
+                        if (!query.startsWith(":")) query = query.replace(/_/g, " ");
+                        query = query.trim();
+                        server = "global";
+                        activation = "_url_global";
+                    }
+
+                    if (query === "cmd/notification") {
+                        const link_code = jwt.sign({id: userId, t: "fb"}, process.env.JWT_SECRET, {noTimestamp: true}).replace("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.", "").replace(".", "$");
+                        sendFacebookTextMessage(userId, "Please use the following code on Poporing Life Facebook Messenger Notification Link when asked");
+                        sendFacebookTextMessage(userId, link_code);
+                        return;
+                    }
+
+                    let data = {
+                        user_id: "facebook-" + userId,
+                        channel_id: "facebook-dm-" + userId,
+                        server_id: null,
+
+                        user_display_name: "you",
+
+                        activation: "facebook_dm" + activation,
+                        query: query,
+
+                        is_direct: true,
+                        is_admin: true,
+
+                        default_server: server,
+                        raw: event,
+                    };
+                    poporing.resolve({
+                        data,
+                        response_template: poporing.default_response_template,
+                        replyText: (text, request) => {
+                            sendFacebookTextMessage(userId, text);
+                        },
+                        replyPriceData: (data, request) => {
+                            const text = data.server_icon + " " + data.display_name + "\nPrice: " + data.price + " z\nVolume: " + data.volume + " ea\n\nLast Update: " + data.timestamp + (data.footnote ? "\n" + data.footnote : "") + "\n\n" + data.url;
+                            sendFacebookTextMessage(userId, text, true);
+                        },
+                    });
                 }
             });
         });
