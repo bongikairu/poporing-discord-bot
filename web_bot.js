@@ -460,8 +460,8 @@ app.post('/facebook_webhook', bodyParser.json(), bodyParser.urlencoded({extended
 
                     if (query === "cmd/notification") {
                         const link_code = jwt.sign({id: userId, t: "fb"}, process.env.JWT_SECRET, {noTimestamp: true}).replace("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.", "").replace(".", "$");
-                        sendFacebookTextMessage(userId, "Please use the following code on Poporing Life Facebook Messenger Notification Link when asked");
-                        sendFacebookTextMessage(userId, link_code);
+                        sendFacebookTextMessage(userId, "Please use the following code on Poporing Life Facebook Messenger Notification Link when asked")
+                            .then(() => sendFacebookTextMessage(userId, link_code));
                         return;
                     }
 
@@ -515,7 +515,8 @@ app.post('/facebook_push', bodyParser.json(), (req, res, next) => {
     const userId = req.body.message.target_id;
     if (req.body.message.image) {
         sendFacebookTextMessage(userId, {
-            messaging_type: "UPDATE",
+            messaging_type: "MESSAGE_TAG",
+            tag: "GAME_EVENT",
             recipient: {
                 id: userId,
             },
@@ -530,7 +531,8 @@ app.post('/facebook_push', bodyParser.json(), (req, res, next) => {
         }, true);
     }
     sendFacebookTextMessage(userId, {
-        messaging_type: "UPDATE",
+        messaging_type: "MESSAGE_TAG",
+        tag: "GAME_EVENT",
         recipient: {
             id: userId,
         },
