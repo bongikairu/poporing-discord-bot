@@ -297,9 +297,13 @@ app.post('/telegram_push', bodyParser.json(), (req, res, next) => {
 });
 
 app.post('/telegram_webhook', bodyParser.json(), (req, res, next) => {
-    console.log(req);
+    // console.log(req);
     console.log(req.body);
-    console.log(req.body.message);
+    // console.log(req.body.message);
+    if (!req.body.message) {
+        res.json({ok: true});
+        return;
+    }
     if (req.body.message.from.is_bot) {
         res.json({ok: true});
         return;
