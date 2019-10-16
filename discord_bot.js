@@ -559,18 +559,18 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                 if (dm_channel) {
                                     bot.sendMessage({
                                         to: channelID,
-                                        message: "Just @ the bot follow by item name to get it latest price, prepend s/ or g/ or s2/ or e/ to specify the server, or use command below to change a default one\n\n" + check_string + "**cmd/myserver=xxx** Set default server for you to This Server\n" + check_string + "**cmd/myserver=auto** Set default server for your to Channel's Default\n\n" + check_string + "**cmd/dm=xxx** Set default server for this DM channel to This Server\n\nServer Choice\n- sea\n- sea2\n- global\n- europe",
+                                        message: "Just @ the bot follow by item name to get it latest price, prepend s/ or g/ or s2/ or e/ to specify the server, or use command below to change a default one\n\n" + check_string + "**cmd/myserver=xxx** Set default server for you to this Server\n" + check_string + "**cmd/myserver=auto** Set default server for your to Channel's Default\n\n" + check_string + "**cmd/dm=xxx** Set default server for this DM channel to this Server\n\nServer Choice\n- sea\n- sea2\n- global\n- europe",
                                     });
                                 } else {
                                     if (!admin_permission) {
                                         bot.sendMessage({
                                             to: channelID,
-                                            message: "Just @ the bot follow by item name to get it latest price, prepend s/ or g/ or s2/ or e/ to specify the server, or use command below to change a default one\n\n" + check_string + "**cmd/myserver=xxx** Set default server for you to This Server\n" + check_string + "**cmd/myserver=auto** Set default server for your to Channel's Default\n\nServer Choice\n- sea\n- sea2\n- global\n- europe",
+                                            message: "Just @ the bot follow by item name to get it latest price, prepend s/ or g/ or s2/ or e/ to specify the server, or use command below to change a default one\n\n" + check_string + "**cmd/myserver=xxx** Set default server for you to this Server\n" + check_string + "**cmd/myserver=auto** Set default server for your to Channel's Default\n\nServer Choice\n- sea\n- sea2\n- global\n- europe",
                                         });
                                     } else {
                                         bot.sendMessage({
                                             to: channelID,
-                                            message: "Just @ the bot follow by item name to get it latest price, prepend s/ or g/ or s2/ or e/ to specify the server, or use command below to change a default one\n\n" + check_string + "**cmd/myserver=xxx** Set default server for you to This Server\n" + check_string + "**cmd/myserver=auto** Set default server for your to Channel's Default\n\nChannel and Server Settings:\n" + check_string + "**cmd/channel=xxx** Set default server for this channel to this Server\n" + check_string + "**cmd/channel=auto** Set default server for this channel to this Discord's default\n" + check_string + "**cmd/default=xxx** Set default server for this discord to Global Server\n\nServer Choice\n- sea\n- sea2\n- global\n- europe",
+                                            message: "Just @ the bot follow by item name to get it latest price, prepend s/ or g/ or s2/ or e/ to specify the server, or use command below to change a default one\n\n" + check_string + "**cmd/myserver=xxx** Set default server for you to this Server\n" + check_string + "**cmd/myserver=auto** Set default server for your to Channel's Default\n\nChannel and Server Settings:\n" + check_string + "**cmd/channel=xxx** Set default server for this channel to this Server\n" + check_string + "**cmd/channel=auto** Set default server for this channel to this Discord's default\n" + check_string + "**cmd/default=xxx** Set default server for this discord to this Server\n\nServer Choice\n- sea\n- sea2\n- global\n- europe",
                                         });
                                     }
                                 }
