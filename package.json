@@ -6,7 +6,7 @@
   "license": "MIT",
   "dependencies": {
     "@line/bot-sdk": "^6.7.0",
-    "axios": "^0.18.0",
+    "axios": "^0.18.1",
     "body-parser": "^1.18.3",
     "date-fns": "^2.0.0-alpha.25",
     "discord.io": "Woor/discord.io#gateway_v6",
