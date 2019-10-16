@@ -32,7 +32,9 @@ const replyText = (token, texts) => {
 };
 
 const url_check_string_sea = "https://poporing.life/?search=";
-const url_check_string_glboal = "https://global.poporing.life/?search=";
+const url_check_string_global = "https://global.poporing.life/?search=";
+const url_check_string_sea2 = "https://sea2.poporing.life/?search=";
+const url_check_string_europe = "https://europe.poporing.life/?search=";
 
 async function handleText(event) {
     const message = event.message;
@@ -57,12 +59,26 @@ async function handleText(event) {
         server = "sea";
         activation = "_url_sea";
         triggered = true;
-    } else if (query.startsWith(url_check_string_glboal)) {
-        query = query.substr(url_check_string_glboal.length);
+    } else if (query.startsWith(url_check_string_global)) {
+        query = query.substr(url_check_string_global.length);
         if (!query.startsWith(":")) query = query.replace(/_/g, " ");
         query = query.trim();
         server = "global";
         activation = "_url_global";
+        triggered = true;
+    } else if (query.startsWith(url_check_string_sea2)) {
+        query = query.substr(url_check_string_sea2.length);
+        if (!query.startsWith(":")) query = query.replace(/_/g, " ");
+        query = query.trim();
+        server = "sea2";
+        activation = "_url_sea2";
+        triggered = true;
+    } else if (query.startsWith(url_check_string_europe)) {
+        query = query.substr(url_check_string_europe.length);
+        if (!query.startsWith(":")) query = query.replace(/_/g, " ");
+        query = query.trim();
+        server = "europe";
+        activation = "_url_europe";
         triggered = true;
     }
 
@@ -331,12 +347,24 @@ app.post('/telegram_webhook', bodyParser.json(), (req, res, next) => {
         query = query.trim();
         server = "sea";
         activation = "_url_sea";
-    } else if (query.startsWith(url_check_string_glboal)) {
-        query = query.substr(url_check_string_glboal.length);
+    } else if (query.startsWith(url_check_string_global)) {
+        query = query.substr(url_check_string_global.length);
         if (!query.startsWith(":")) query = query.replace(/_/g, " ");
         query = query.trim();
         server = "global";
         activation = "_url_global";
+    } else if (query.startsWith(url_check_string_sea2)) {
+        query = query.substr(url_check_string_sea2.length);
+        if (!query.startsWith(":")) query = query.replace(/_/g, " ");
+        query = query.trim();
+        server = "sea2";
+        activation = "_url_sea2";
+    } else if (query.startsWith(url_check_string_europe)) {
+        query = query.substr(url_check_string_europe.length);
+        if (!query.startsWith(":")) query = query.replace(/_/g, " ");
+        query = query.trim();
+        server = "europe";
+        activation = "_url_europe";
     }
 
     if (query === "cmd/notification") {
@@ -456,12 +484,24 @@ app.post('/facebook_webhook', bodyParser.json(), bodyParser.urlencoded({extended
                         query = query.trim();
                         server = "sea";
                         activation = "_url_sea";
-                    } else if (query.startsWith(url_check_string_glboal)) {
-                        query = query.substr(url_check_string_glboal.length);
+                    } else if (query.startsWith(url_check_string_global)) {
+                        query = query.substr(url_check_string_global.length);
                         if (!query.startsWith(":")) query = query.replace(/_/g, " ");
                         query = query.trim();
                         server = "global";
                         activation = "_url_global";
+                    } else if (query.startsWith(url_check_string_sea2)) {
+                        query = query.substr(url_check_string_sea2.length);
+                        if (!query.startsWith(":")) query = query.replace(/_/g, " ");
+                        query = query.trim();
+                        server = "sea2";
+                        activation = "_url_sea2";
+                    } else if (query.startsWith(url_check_string_europe)) {
+                        query = query.substr(url_check_string_europe.length);
+                        if (!query.startsWith(":")) query = query.replace(/_/g, " ");
+                        query = query.trim();
+                        server = "europe";
+                        activation = "_url_europe";
                     }
 
                     if (query === "cmd/notification") {

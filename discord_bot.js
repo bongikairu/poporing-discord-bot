@@ -107,11 +107,13 @@ bot.on('message', function (user, userID, channelID, message, evt) {
     const check_string_nick = "<@!" + bot.id + "> ";
     const check_string_name = "@PoporingBot ";
     const url_check_string_sea = "https://poporing.life/?search=";
-    const url_check_string_glboal = "https://global.poporing.life/?search=";
+    const url_check_string_global = "https://global.poporing.life/?search=";
+    const url_check_string_sea2 = "https://sea2.poporing.life/?search=";
+    const url_check_string_europe = "https://europe.poporing.life/?search=";
     if (userID === bot.id) {
         return;
     }
-    if (message.startsWith(check_string) || message.startsWith(check_string_nick) || message.startsWith(check_string_name) || message.startsWith(url_check_string_sea) || message.startsWith(url_check_string_glboal) || dm_channel) {
+    if (message.startsWith(check_string) || message.startsWith(check_string_nick) || message.startsWith(check_string_name) || message.startsWith(url_check_string_sea) || message.startsWith(url_check_string_global) || dm_channel) {
         let server = null;
         let activation = "dm";
         let search_query = message.trim();
@@ -125,17 +127,29 @@ bot.on('message', function (user, userID, channelID, message, evt) {
             search_query = message.substr(check_string_name.length).trim();
             activation = "mention_text";
         } else if (message.startsWith(url_check_string_sea)) {
-            search_query = message.substr(url_check_string_glboal.length);
+            search_query = message.substr(url_check_string_global.length);
             if (!search_query.startsWith(":")) search_query = search_query.replace(/_/g, " ");
             search_query = search_query.trim();
             server = "sea";
             activation = "url_sea";
-        } else if (message.startsWith(url_check_string_glboal)) {
-            search_query = message.substr(url_check_string_glboal.length);
+        } else if (message.startsWith(url_check_string_global)) {
+            search_query = message.substr(url_check_string_global.length);
             if (!search_query.startsWith(":")) search_query = search_query.replace(/_/g, " ");
             search_query = search_query.trim();
             server = "global";
             activation = "url_global";
+        } else if (message.startsWith(url_check_string_sea2)) {
+            search_query = message.substr(url_check_string_sea2.length);
+            if (!search_query.startsWith(":")) search_query = search_query.replace(/_/g, " ");
+            search_query = search_query.trim();
+            server = "sea2";
+            activation = "url_sea2";
+        } else if (message.startsWith(url_check_string_europe)) {
+            search_query = message.substr(url_check_string_europe.length);
+            if (!search_query.startsWith(":")) search_query = search_query.replace(/_/g, " ");
+            search_query = search_query.trim();
+            server = "europe";
+            activation = "url_europe";
         }
         let query = search_query;
         const has_slash = search_query.indexOf("/");
@@ -165,15 +179,30 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                     if (server === "s") {
                         server = "sea";
                     }
+                    if (server === "s1") {
+                        server = "sea";
+                    }
+                    if (server === "s2") {
+                        server = "sea2";
+                    }
                     if (server === "g") {
                         server = "global";
+                    }
+                    if (server === "g1") {
+                        server = "global";
+                    }
+                    if (server === "e") {
+                        server = "europe";
+                    }
+                    if (server === "e1") {
+                        server = "europe";
                     }
 
                     if (query === "help") {
                         server = "cmd";
                     }
 
-                    if (server === "sea" || server === "global") {
+                    if (server === "sea" || server === "global" || server === "sea2" || server === "europe") {
                         const from_params = query.startsWith(":");
                         const lower_search_term = query.toLowerCase();
                         let show_list = null;
@@ -213,11 +242,11 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                         }
                         const item_name = show_list.name;
 
-                        const api = "https://" + (server === "sea" ? "api" : "api-global") + ".poporing.life/get_latest_price/" + item_name;
-                        const api_origin = "https://" + (server === "sea" ? "" : "global.") + "poporing.life";
+                        const api = "https://" + ({"sea": "api", "global": "api-global", "sea2": "api-sea2", "europe": "api-europe"}[server] || "api") + ".poporing.life/get_latest_price/" + item_name;
+                        const api_origin = "https://" + ({"sea": "", "global": "global.", "sea2": "sea2.", "europe": "europe."}[server] || "") + "poporing.life";
 
-                        const server_icon = server === "sea" ? "[SEA] " : "[Global] ";
-                        const server_url = server === "sea" ? "https://poporing.life/?search=:" : "https://global.poporing.life/?search=:";
+                        const server_icon = ({"sea": "[SEA] ", "global": "[Global] ", "sea2": "[SEA2] ", "europe": "[EU] "}[server] || "[SEA] ");
+                        const server_url = "https://" + ({"sea": "", "global": "global.", "sea2": "sea2.", "europe": "europe."}[server] || "") + "poporing.life/?search=:";
 
                         axios.get(api, {
                             headers: {
@@ -280,7 +309,15 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                     channelIsDM: !!dm_channel,
                                     user: userID,
                                 });
-                                const color = server === "sea" ? 35037 : 16776960;
+
+                                const color_int = {
+                                    "sea": 35037,
+                                    "global": 16776960,
+                                    "sea2": 16758528,
+                                    "europe": 65791,
+                                }[server];
+                                const color = color_int;
+
                                 bot.sendMessage({
                                     to: channelID,
                                     // message: server_icon + " " + show_list.display_name + " / Price = " + numeral(price).format("0,0") + " / Volume = " + numeral(volume).format("0,0") + " / Last Update " + formatDistance(fromTimestamp(timestamp), new Date()),
@@ -363,6 +400,22 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                     message: "Default Server for <@" + userID + "> set to SEA",
                                 });
                                 break;
+                            case "myserver=sea2":
+                                client.set("u." + userID, "sea2");
+                                cmd_done = true;
+                                bot.sendMessage({
+                                    to: channelID,
+                                    message: "Default Server for <@" + userID + "> set to SEA2",
+                                });
+                                break;
+                            case "myserver=europe":
+                                client.set("u." + userID, "europe");
+                                cmd_done = true;
+                                bot.sendMessage({
+                                    to: channelID,
+                                    message: "Default Server for <@" + userID + "> set to Europe",
+                                });
+                                break;
                             case "myserver=auto":
                                 client.set("u." + userID, "auto");
                                 cmd_done = true;
@@ -388,6 +441,26 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                     bot.sendMessage({
                                         to: channelID,
                                         message: "Default Server for this Channel set to SEA",
+                                    });
+                                }
+                                break;
+                            case "channel=sea2":
+                                if (admin_permission && !dm_channel) {
+                                    client.set("c." + channelID, "sea2");
+                                    cmd_done = true;
+                                    bot.sendMessage({
+                                        to: channelID,
+                                        message: "Default Server for this Channel set to SEA2",
+                                    });
+                                }
+                                break;
+                            case "channel=europe":
+                                if (admin_permission && !dm_channel) {
+                                    client.set("c." + channelID, "europe");
+                                    cmd_done = true;
+                                    bot.sendMessage({
+                                        to: channelID,
+                                        message: "Default Server for this Channel set to Europe",
                                     });
                                 }
                                 break;
@@ -421,6 +494,26 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                     });
                                 }
                                 break;
+                            case "dm=sea2":
+                                if (admin_permission && dm_channel) {
+                                    client.set("c." + channelID, "sea2");
+                                    cmd_done = true;
+                                    bot.sendMessage({
+                                        to: channelID,
+                                        message: "Default Server for this DM Channel set to SEA2",
+                                    });
+                                }
+                                break;
+                            case "dm=europe":
+                                if (admin_permission && dm_channel) {
+                                    client.set("c." + channelID, "europe");
+                                    cmd_done = true;
+                                    bot.sendMessage({
+                                        to: channelID,
+                                        message: "Default Server for this DM Channel set to Europe",
+                                    });
+                                }
+                                break;
                             case "default=global":
                                 if (admin_permission) {
                                     client.set("s." + guild_id, "global");
@@ -441,23 +534,43 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                     });
                                 }
                                 break;
+                            case "default=sea2":
+                                if (admin_permission) {
+                                    client.set("s." + guild_id, "sea2");
+                                    cmd_done = true;
+                                    bot.sendMessage({
+                                        to: channelID,
+                                        message: "Default Server for this Discord set to SEA2",
+                                    });
+                                }
+                                break;
+                            case "default=europe":
+                                if (admin_permission) {
+                                    client.set("s." + guild_id, "europe");
+                                    cmd_done = true;
+                                    bot.sendMessage({
+                                        to: channelID,
+                                        message: "Default Server for this Discord set to Europe",
+                                    });
+                                }
+                                break;
                             case "help":
                                 cmd_done = true;
                                 if (dm_channel) {
                                     bot.sendMessage({
                                         to: channelID,
-                                        message: "Just @ the bot follow by item name to get it latest price, prepend s/ or g/ to specify the server, or use command below to change a default one\n\n" + check_string + "**cmd/myserver=global** Set default server for you to Global Server\n" + check_string + "**cmd/myserver=sea** Set default server for you to SEA Server\n" + check_string + "**cmd/myserver=auto** Set default server for your to Channel's Default\n\n" + check_string + "**cmd/dm=global** Set default server for this DM channel to Global Server\n" + check_string + "**cmd/dm=sea** Set default server for this DM channel to SEA Server",
+                                        message: "Just @ the bot follow by item name to get it latest price, prepend s/ or g/ or s2/ or e/ to specify the server, or use command below to change a default one\n\n" + check_string + "**cmd/myserver=xxx** Set default server for you to This Server\n" + check_string + "**cmd/myserver=auto** Set default server for your to Channel's Default\n\n" + check_string + "**cmd/dm=xxx** Set default server for this DM channel to This Server\n\nServer Choice\n- sea\n- sea2\n- global\n- europe",
                                     });
                                 } else {
                                     if (!admin_permission) {
                                         bot.sendMessage({
                                             to: channelID,
-                                            message: "Just @ the bot follow by item name to get it latest price, prepend s/ or g/ to specify the server, or use command below to change a default one\n\n" + check_string + "**cmd/myserver=global** Set default server for you to Global Server\n" + check_string + "**cmd/myserver=sea** Set default server for you to SEA Server\n" + check_string + "**cmd/myserver=auto** Set default server for your to Channel's Default",
+                                            message: "Just @ the bot follow by item name to get it latest price, prepend s/ or g/ or s2/ or e/ to specify the server, or use command below to change a default one\n\n" + check_string + "**cmd/myserver=xxx** Set default server for you to This Server\n" + check_string + "**cmd/myserver=auto** Set default server for your to Channel's Default\n\nServer Choice\n- sea\n- sea2\n- global\n- europe",
                                         });
                                     } else {
                                         bot.sendMessage({
                                             to: channelID,
-                                            message: "Just @ the bot follow by item name to get it latest price, prepend s/ or g/ to specify the server, or use command below to change a default one\n\n" + check_string + "**cmd/myserver=global** Set default server for you to Global Server\n" + check_string + "**cmd/myserver=sea** Set default server for you to SEA Server\n" + check_string + "**cmd/myserver=auto** Set default server for your to Channel's Default\n\nChannel and Server Settings:\n" + check_string + "**cmd/channel=global** Set default server for this channel to Global Server\n" + check_string + "**cmd/channel=sea** Set default server for this channel to SEA Server\n" + check_string + "**cmd/channel=auto** Set default server for this channel to this Discord's default\n" + check_string + "**cmd/default=global** Set default server for this discord to Global Server\n" + check_string + "**cmd/default=sea** Set default server for this discord to SEA Server\n",
+                                            message: "Just @ the bot follow by item name to get it latest price, prepend s/ or g/ or s2/ or e/ to specify the server, or use command below to change a default one\n\n" + check_string + "**cmd/myserver=xxx** Set default server for you to This Server\n" + check_string + "**cmd/myserver=auto** Set default server for your to Channel's Default\n\nChannel and Server Settings:\n" + check_string + "**cmd/channel=xxx** Set default server for this channel to this Server\n" + check_string + "**cmd/channel=auto** Set default server for this channel to this Discord's default\n" + check_string + "**cmd/default=xxx** Set default server for this discord to Global Server\n\nServer Choice\n- sea\n- sea2\n- global\n- europe",
                                         });
                                     }
                                 }

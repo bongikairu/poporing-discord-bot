@@ -22,22 +22,30 @@ const default_response_template = {
 
     CMD_SETTING_MY_GLOBAL: "Default Server for %1$s set to Global",
     CMD_SETTING_MY_SEA: "Default Server for %1$s set to SEA",
+    CMD_SETTING_MY_SEA2: "Default Server for %1$s set to SEA2",
+    CMD_SETTING_MY_EUROPE: "Default Server for %1$s set to Europe",
     CMD_SETTING_MY_AUTO: "Default Server for %1$s set to Channel's Default",
 
     CMD_SETTING_CHANNEL_GLOBAL: "Default Server for this Channel set to Global",
     CMD_SETTING_CHANNEL_SEA: "Default Server for this Channel set to SEA",
+    CMD_SETTING_CHANNEL_SEA2: "Default Server for this Channel set to SEA2",
+    CMD_SETTING_CHANNEL_EUROPE: "Default Server for this Channel set to Europe",
     CMD_SETTING_CHANNEL_AUTO: "Default Server for this Channel set to Discord's Default",
 
     CMD_SETTING_DM_GLOBAL: "Default Server for this DM Channel set to Global",
     CMD_SETTING_DM_SEA: "Default Server for this DM Channel set to SEA",
+    CMD_SETTING_DM_SEA2: "Default Server for this DM Channel set to SEA2",
+    CMD_SETTING_DM_EUROPE: "Default Server for this DM Channel set to Europe",
 
     CMD_SETTING_SERVER_GLOBAL: "Default Server for this Discord set to Global",
     CMD_SETTING_SERVER_SEA: "Default Server for this Discord set to SEA",
+    CMD_SETTING_SERVER_SEA2: "Default Server for this Discord set to SEA2",
+    CMD_SETTING_SERVER_EUROPE: "Default Server for this Discord set to Europe",
 
-    CMD_HELP_USER_DM: "Just @ the bot follow by item name to get it latest price, prepend s/ or g/ to specify the server, or use command below to change a default one\n\ncmd/myserver=global Set default server for you to Global Server\ncmd/myserver=sea Set default server for you to SEA Server\ncmd/myserver=auto Set default server for your to Channel's Default",
-    CMD_HELP_USER_CHANNEL: "Just @ the bot follow by item name to get it latest price, prepend s/ or g/ to specify the server, or use command below to change a default one\n\ncmd/myserver=global Set default server for you to Global Server\ncmd/myserver=sea Set default server for you to SEA Server\ncmd/myserver=auto Set default server for your to Channel's Default",
-    CMD_HELP_ADMIN_CHANNEL: "Just @ the bot follow by item name to get it latest price, prepend s/ or g/ to specify the server, or use command below to change a default one\n\ncmd/myserver=global Set default server for you to Global Server\ncmd/myserver=sea Set default server for you to SEA Server\ncmd/myserver=auto Set default server for your to Channel's Default",
-    CMD_HELP_ADMIN_SERVER: "Just @ the bot follow by item name to get it latest price, prepend s/ or g/ to specify the server, or use command below to change a default one\n\ncmd/myserver=global Set default server for you to Global Server\ncmd/myserver=sea Set default server for you to SEA Server\ncmd/myserver=auto Set default server for your to Channel's Default",
+    CMD_HELP_USER_DM: "Just @ the bot follow by item name to get it latest price, prepend s/ or g/ or s2/ or e/ to specify the server, or use command below to change a default one\n\ncmd/myserver=xxx Set default server for you to this Server\ncmd/myserver=auto Set default server for your to Channel's Default\n\nServer Choice\n- sea\n- sea2\n- global\n- europe",
+    CMD_HELP_USER_CHANNEL: "Just @ the bot follow by item name to get it latest price, prepend s/ or g/ or s2/ or e/ to specify the server, or use command below to change a default one\n\ncmd/myserver=xxx Set default server for you to this Server\ncmd/myserver=auto Set default server for your to Channel's Default\n\nServer Choice\n- sea\n- sea2\n- global\n- europe",
+    CMD_HELP_ADMIN_CHANNEL: "Just @ the bot follow by item name to get it latest price, prepend s/ or g/ or s2/ or e/ to specify the server, or use command below to change a default one\n\ncmd/myserver=xxx Set default server for you to this Server\ncmd/myserver=auto Set default server for your to Channel's Default\n\nServer Choice\n- sea\n- sea2\n- global\n- europe",
+    CMD_HELP_ADMIN_SERVER: "Just @ the bot follow by item name to get it latest price, prepend s/ or g/ or s2/ or e/ to specify the server, or use command below to change a default one\n\ncmd/myserver=xxx Set default server for you to this Server\ncmd/myserver=auto Set default server for your to Channel's Default\n\nServer Choice\n- sea\n- sea2\n- global\n- europe",
 };
 
 const sample_request = {
@@ -200,10 +208,15 @@ const resolve = async (request) => {
 
     if (!server) server = default_server;
     if (server === "s") server = "sea";
+    if (server === "s1") server = "sea";
+    if (server === "s2") server = "sea2";
     if (server === "g") server = "global";
+    if (server === "g1") server = "global";
+    if (server === "e") server = "europe";
+    if (server === "e1") server = "europe";
     if (query === "help") server = "cmd";
 
-    if (server === "sea" || server === "global") {
+    if (server === "sea" || server === "global" || server === "sea2" || server === "europe") {
         const from_params = query.startsWith(":");
         const lower_search_term = query.toLowerCase();
         let show_list = null;
@@ -237,11 +250,11 @@ const resolve = async (request) => {
 
         const item_name = show_list.name;
 
-        const api = "https://" + (server === "sea" ? "api" : "api-global") + ".poporing.life/get_latest_price/" + item_name;
-        const api_origin = "https://" + (server === "sea" ? "" : "global.") + "poporing.life";
+        const api = "https://" + ({"sea": "api", "global": "api-global", "sea2": "api-sea2", "europe": "api-europe"}[server] || "api") + ".poporing.life/get_latest_price/" + item_name;
+        const api_origin = "https://" + ({"sea": "", "global": "global.", "sea2": "sea2.", "europe": "europe."}[server] || "") + "poporing.life";
 
-        const server_icon = server === "sea" ? "[SEA] " : "[Global] ";
-        const server_url = server === "sea" ? "https://poporing.life/?search=:" : "https://global.poporing.life/?search=:";
+        const server_icon = ({"sea": "[SEA] ", "global": "[Global] ", "sea2": "[SEA2] ", "europe": "[EU] "}[server] || "[SEA] ");
+        const server_url = "https://" + ({"sea": "", "global": "global.", "sea2": "sea2.", "europe": "europe."}[server] || "") + "poporing.life/?search=:";
 
         let response = null;
 
@@ -317,8 +330,18 @@ const resolve = async (request) => {
             request: r,
         });
 
-        const color_hex = server === "sea" ? "#0088dd" : "#FFFF00";
-        const color_int = server === "sea" ? 35037 : 16776960;
+        const color_hex = {
+            "sea": "#0088dd",
+            "global": "#FFFF00",
+            "sea2": "#ffb700",
+            "europe": "#0100ff",
+        }[server];
+        const color_int = {
+            "sea": 35037,
+            "global": 16776960,
+            "sea2": 16758528,
+            "europe": 65791,
+        }[server];
 
         const return_data = {
 
@@ -357,6 +380,18 @@ const resolve = async (request) => {
                 reply = sprintf(default_response_template.CMD_SETTING_MY_SEA, r.user_display_name);
                 if (request.replyText) await request.replyText.call(request, reply, request);
                 break;
+            case "myserver=sea2":
+                redis_client.set("u." + r.user_id, "sea2");
+                cmd_done = true;
+                reply = sprintf(default_response_template.CMD_SETTING_MY_SEA2, r.user_display_name);
+                if (request.replyText) await request.replyText.call(request, reply, request);
+                break;
+            case "myserver=europe":
+                redis_client.set("u." + r.user_id, "europe");
+                cmd_done = true;
+                reply = sprintf(default_response_template.CMD_SETTING_MY_EUROPE, r.user_display_name);
+                if (request.replyText) await request.replyText.call(request, reply, request);
+                break;
             case "myserver=auto":
                 redis_client.set("u." + r.user_id, "auto");
                 cmd_done = true;
@@ -376,6 +411,22 @@ const resolve = async (request) => {
                     redis_client.set("c." + r.channel_id, "sea");
                     cmd_done = true;
                     reply = sprintf(default_response_template.CMD_SETTING_CHANNEL_SEA);
+                    if (request.replyText) await request.replyText.call(request, reply, request);
+                }
+                break;
+            case "channel=sea2":
+                if (admin_permission && !r.is_direct) {
+                    redis_client.set("c." + r.channel_id, "sea2");
+                    cmd_done = true;
+                    reply = sprintf(default_response_template.CMD_SETTING_CHANNEL_SEA2);
+                    if (request.replyText) await request.replyText.call(request, reply, request);
+                }
+                break;
+            case "channel=europe":
+                if (admin_permission && !r.is_direct) {
+                    redis_client.set("c." + r.channel_id, "europe");
+                    cmd_done = true;
+                    reply = sprintf(default_response_template.CMD_SETTING_CHANNEL_EUROPE);
                     if (request.replyText) await request.replyText.call(request, reply, request);
                 }
                 break;
@@ -403,6 +454,22 @@ const resolve = async (request) => {
                     if (request.replyText) await request.replyText.call(request, reply, request);
                 }
                 break;
+            case "dm=sea2":
+                if (admin_permission && r.is_direct) {
+                    redis_client.set("c." + r.channel_id, "sea2");
+                    cmd_done = true;
+                    reply = sprintf(default_response_template.CMD_SETTING_DM_SEA2);
+                    if (request.replyText) await request.replyText.call(request, reply, request);
+                }
+                break;
+            case "dm=europe":
+                if (admin_permission && r.is_direct) {
+                    redis_client.set("c." + r.channel_id, "europe");
+                    cmd_done = true;
+                    reply = sprintf(default_response_template.CMD_SETTING_DM_EUROPE);
+                    if (request.replyText) await request.replyText.call(request, reply, request);
+                }
+                break;
             case "default=global":
                 if (admin_permission) {
                     redis_client.set("s." + r.server_id, "global");
@@ -416,6 +483,22 @@ const resolve = async (request) => {
                     redis_client.set("s." + r.server_id, "sea");
                     cmd_done = true;
                     reply = sprintf(default_response_template.CMD_SETTING_SERVER_SEA);
+                    if (request.replyText) await request.replyText.call(request, reply, request);
+                }
+                break;
+            case "default=sea2":
+                if (admin_permission) {
+                    redis_client.set("s." + r.server_id, "sea2");
+                    cmd_done = true;
+                    reply = sprintf(default_response_template.CMD_SETTING_SERVER_SEA2);
+                    if (request.replyText) await request.replyText.call(request, reply, request);
+                }
+                break;
+            case "default=europe":
+                if (admin_permission) {
+                    redis_client.set("s." + r.server_id, "europe");
+                    cmd_done = true;
+                    reply = sprintf(default_response_template.CMD_SETTING_SERVER_EUROPE);
                     if (request.replyText) await request.replyText.call(request, reply, request);
                 }
                 break;
