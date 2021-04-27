@@ -14,7 +14,7 @@
     "fuse.js": "^3.3.0",
     "jsonwebtoken": "^8.5.1",
     "numeral": "^2.0.6",
-    "redis": "^2.8.0",
+    "redis": "^3.1.1",
     "sprintf-js": "^1.1.2",
     "telegram-bot-client": "^2.1.1",
     "winston": "^3.2.0"
