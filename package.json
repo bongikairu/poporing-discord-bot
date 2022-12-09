@@ -10,7 +10,7 @@
     "body-parser": "^1.18.3",
     "date-fns": "^2.0.0-alpha.25",
     "discord.io": "Woor/discord.io#gateway_v6",
-    "express": "^4.16.4",
+    "express": "^4.17.3",
     "fuse.js": "^3.3.0",
     "jsonwebtoken": "^8.5.1",
     "numeral": "^2.0.6",
