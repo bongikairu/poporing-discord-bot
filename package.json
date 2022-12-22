@@ -12,7 +12,7 @@
     "discord.io": "Woor/discord.io#gateway_v6",
     "express": "^4.16.4",
     "fuse.js": "^3.3.0",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "numeral": "^2.0.6",
     "redis": "^2.8.0",
     "sprintf-js": "^1.1.2",
